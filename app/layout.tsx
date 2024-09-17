@@ -5,26 +5,25 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 import { headers } from "next/headers"; // added
-import { cookieToInitialState } from "wagmi"; // added
-import { config } from "@/config"; // added
-import Web3ModalProvider from "@/context"; // added
+import ContextProvider from '@/context'
 
 export const metadata: Metadata = {
-  title: "AppKit + Scroll - Example App",
-  description: "Powered by WalletConnect"
+  title: "AppKit Example App",
+  description: "Powered by Reown"
 };
 
 export default function RootLayout({
   children
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
-  const initialState = cookieToInitialState(config, headers().get("cookie")); // added
+  const cookies = headers().get('cookie')
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Web3ModalProvider initialState={initialState}>{children}</Web3ModalProvider>
+        <ContextProvider cookies={cookies}>{children}</ContextProvider>
       </body>
     </html>
-  );
+  )
 }

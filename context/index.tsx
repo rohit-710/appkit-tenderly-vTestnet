@@ -1,35 +1,52 @@
-"use client";
+'use client'
 
-import React, { ReactNode } from "react";
-import { config, projectId, metadata } from "@/config";
-import { createWeb3Modal } from "@web3modal/wagmi/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { State, WagmiProvider } from "wagmi";
+import { wagmiAdapter, projectId } from '@/config'
+import { createAppKit } from '@reown/appkit/react' 
+import { mainnet, arbitrum } from '@reown/appkit/networks'
 
-// Setup queryClient
-const queryClient = new QueryClient();
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import React, { type ReactNode } from 'react'
+import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi'
 
-if (!projectId) throw new Error("Project ID is not defined");
+// Set up queryClient
+const queryClient = new QueryClient()
 
-// Create modal
-createWeb3Modal({
-  metadata,
-  wagmiConfig: config,
+if (!projectId) {
+  throw new Error('Project ID is not defined')
+}
+
+// Set up metadata
+const metadata = { //this is optional
+  name: "appkit-example",
+  description: "AppKit Example - EVM",
+  url: "https://exampleapp.com", // origin must match your domain & subdomain
+  icons: ["https://avatars.githubusercontent.com/u/37784886"]
+}
+
+// Create the modal
+const modal = createAppKit({
+  adapters: [wagmiAdapter],
   projectId,
-  enableAnalytics: true, // Optional - defaults to your Cloud configuration
-  enableOnramp: true, // Optional - false as default
-  themeMode: "light", // By default - set to user system settings
-  themeVariables: {
-    "--w3m-font-family": "Verdana", // Base font family
-    "--w3m-border-radius-master": "2px",
-    "--w3m-z-index": 1
-  }
-});
+  networks: [mainnet, arbitrum],
+  defaultNetwork: mainnet,
+  metadata: metadata,
+  features: {
+    analytics: true, // Optional - defaults to your Cloud configuration
+    email: true, // default to true
+    socials: ['google', 'x', 'github', 'discord', 'apple', 'facebook', 'farcaster'],
+    emailShowWallets: true, // default to true
+  },
+  themeMode: 'light'
+})
 
-export default function Web3ModalProvider({ children, initialState }: { children: ReactNode; initialState?: State }) {
+function ContextProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
+  const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig as Config, cookies)
+
   return (
-    <WagmiProvider config={config} initialState={initialState}>
+    <WagmiProvider config={wagmiAdapter.wagmiConfig as Config} initialState={initialState}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
-  );
+  )
 }
+
+export default ContextProvider
