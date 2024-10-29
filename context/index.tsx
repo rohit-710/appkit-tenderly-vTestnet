@@ -3,6 +3,7 @@
 import { wagmiAdapter, projectId } from '@/config'
 import { createAppKit } from '@reown/appkit/react' 
 import { mainnet, arbitrum } from '@reown/appkit/networks'
+import { vTestnet } from '@/app/tenderly.config'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { type ReactNode } from 'react'
@@ -27,7 +28,7 @@ const metadata = { //this is optional
 const modal = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
-  networks: [mainnet, arbitrum],
+  networks: [mainnet, arbitrum, vTestnet],
   defaultNetwork: mainnet,
   metadata: metadata,
   features: {
